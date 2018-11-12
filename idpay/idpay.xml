@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" version="3.5" method="upgrade" group="hikashoppayment">
+    <name>IDPay</name>
+    <version>1.0</version>
+    <description>IDPay</description>
+    <author>Developer: JMDMahdi, Publisher: IDPay</author>
+    <authorUrl>http://idpay.ir</authorUrl>
+    <authorEmail>info@idpay.ir</authorEmail>
+    <creationDate>November 2018</creationDate>
+    <copyright>Copyright (C) 2018 IDPay</copyright>
+    <license>http://www.gnu.org/licenses/gpl-2.0.html GPLv2 or later</license>
+    <files>
+        <filename plugin="idpay">idpay.php</filename>
+        <filename>idpay_configuration.php</filename>
+        <filename>idpay_redirect.php</filename>
+    </files>
+    <params addpath="/components/com_hikashop/params">
+        <param name="pluginoptions" type="pluginoptions" default="plugin" label="hikashop"
+               description="HikaShop options"/>
+    </params>
+    <config>
+        <fields name="params" addfieldpath="/components/com_hikashop/fields">
+            <fieldset name="basic">
+                <field id="pluginoptions" name="pluginoptions" type="pluginoptions" label="hikashop"
+                       description="HikaShop options"/>
+            </fieldset>
+        </fields>
+    </config>
+</extension>
