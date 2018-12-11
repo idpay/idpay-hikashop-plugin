@@ -56,13 +56,13 @@ defined('_JEXEC') or die('Restricted access'); ?>
 </tr>
 <tr>
     <td class="key">
-        <label for="data[payment][payment_params][failed_massage]"><?php
+        <label for="data[payment][payment_params][failed_message]"><?php
             echo JText::_('پیام پرداخت ناموفق');
             ?></label>
     </td>
     <td>
         <textarea type="text"
-                  name="data[payment][payment_params][failed_massage]"><?php echo(!empty($this->escape(@$this->element->payment_params->failed_massage)) ? $this->escape(@$this->element->payment_params->failed_massage) : "پرداخت شما ناموفق بوده است. لطفا مجددا تلاش نمایید یا در صورت بروز اشکال با مدیر سایت تماس بگیرید."); ?></textarea>
+                  name="data[payment][payment_params][failed_message]"><?php echo(!empty($this->escape(@$this->element->payment_params->failed_message)) ? $this->escape(@$this->element->payment_params->failed_massage) : "پرداخت شما ناموفق بوده است. لطفا مجددا تلاش نمایید یا در صورت بروز اشکال با مدیر سایت تماس بگیرید."); ?></textarea>
         <br>
         متن پیامی که می خواهید بعد از پرداخت ناموفق به کاربر نمایش دهید را وارد کنید. همچنین می توانید از شورت کدهای
         {order_id} برای نمایش شماره سفارش و {track_id} برای نمایش کد رهگیری آیدی پی استفاده نمایید.
