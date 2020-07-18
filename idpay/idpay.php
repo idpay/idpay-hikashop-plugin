@@ -72,7 +72,7 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
   {
     parent::onAfterOrderConfirm($order, $methods, $method_id);
 
-    $api_key = $this->payment_params->api_key . 's';
+    $api_key = $this->payment_params->api_key;
     $sandbox = $this->payment_params->sandbox == 'no' ? 'false' : 'true';
 
     $amount = round($order->cart->full_total->prices[0]->price_value_with_tax, (int)$this->currency->currency_locale['int_frac_digits']);
@@ -297,8 +297,8 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
    */
   public function getPaymentDefaultValues(&$element)
   {
-    $element->payment_name = 'درگاه پرداخت idpay';
-    $element->payment_description = '';
+    $element->payment_name = 'پرداخت امن با آیدی پی';
+    $element->payment_description = 'پرداخت امن به وسیله کلیه کارتهای عضو شتاب با درگاه پرداخت آیدی پی';
     $element->payment_images = '';
     $element->payment_params->invalid_status = 'cancelled';
     $element->payment_params->pending_status = 'created';
