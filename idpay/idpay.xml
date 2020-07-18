@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension type="plugin" version="3.5" method="upgrade" group="hikashoppayment">
+<extension type="plugin" version="3.6" method="upgrade" group="hikashoppayment">
     <name>IDPay</name>
     <version>1.0</version>
     <description>IDPay</description>
-    <author>Developer: JMDMahdi, Publisher: IDPay</author>
+    <author>Developer: JMDMahdi, vispa, mnbp1371 , Publisher: IDPay</author>
     <authorUrl>http://idpay.ir</authorUrl>
     <authorEmail>info@idpay.ir</authorEmail>
-    <creationDate>November 2018</creationDate>
-    <copyright>Copyright (C) 2018 IDPay</copyright>
+    <creationDate>July 2020</creationDate>
+    <copyright>Copyright (C) 2020 IDPay</copyright>
     <license>http://www.gnu.org/licenses/gpl-2.0.html GPLv2 or later</license>
     <files>
         <filename plugin="idpay">idpay.php</filename>
