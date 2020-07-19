@@ -2,11 +2,11 @@
 /**
  * IDPay payment plugin
  *
- * @developer JMDMahdi
+ * @developer JMDMahdi, vispa, mnbp1371
  * @publisher IDPay
  * @package VirtueMart
  * @subpackage payment
- * @copyright (C) 2018 IDPay
+ * @copyright (C) 2020 IDPay
  * @license http://www.gnu.org/licenses/gpl-2.0.html GPLv2 or later
  *
  * http://idpay.ir
@@ -72,16 +72,17 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
   {
     parent::onAfterOrderConfirm($order, $methods, $method_id);
 
+    //set information for request
     $api_key = $this->payment_params->api_key;
     $sandbox = $this->payment_params->sandbox == 'no' ? 'false' : 'true';
-
-    $amount = round($order->cart->full_total->prices[0]->price_value_with_tax, (int)$this->currency->currency_locale['int_frac_digits']);
     $desc = 'پرداخت سفارش شماره: ' . $order->order_id;
     $callback = HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=checkout&task=notify&notif_payment=' . $this->name . '&tmpl=component&lang=' . $this->locale . $this->url_itemid;
 
+    //check amount
+    $amount = round($order->cart->full_total->prices[0]->price_value_with_tax, (int)$this->currency->currency_locale['int_frac_digits']);
     if (empty($amount)) {
       $msg = $this->idpay_get_failed_message(null, null, '1001');
-      $this->order_log($order->order_id, $msg);
+      $this->order_log($order->order_id, $this->otherStatusMessages(1001));
       $cancel_url = HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order&task=cancel_order&order_id=' . $order->order_id . $this->url_itemid;
       $app = JFactory::getApplication();
       $app->redirect($cancel_url, $msg, 'Error');
@@ -93,6 +94,7 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
     $phone = $billing->address_telephone;
     $mail = $order->customer->user_email;
 
+    //set params and send request
     $data = array('order_id' => $order->order_id, 'amount' => $amount, 'name' => $name, 'phone' => $phone, 'mail' => $mail, 'desc' => $desc, 'callback' => $callback,);
     $url = 'https://api.idpay.ir/v1.1/payment';
     $options = $this->options($api_key, $sandbox);
@@ -100,6 +102,7 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
     $http_status = $result->code;
     $result = json_decode($result->body);
 
+    //check http error
     if ($http_status != 201 || empty($result) || empty($result->id) || empty($result->link)) {
       $msg = sprintf('خطا هنگام ایجاد تراکنش. وضعیت خطا: %s - کد خطا: %s - پیام خطا: %s', $http_status, $result->error_code, $result->error_message);
       $this->order_log($order->order_id, $msg);
@@ -111,6 +114,7 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
     //save idpay id in db(result id)
     $this->order_log($order->order_id, "idpay_id:$result->id");
 
+    //redirect to result
     $this->payment_params->url = $result->link;
     return $this->showPage('redirect');
   }
@@ -124,7 +128,6 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
   {
     $filter = JFilterInput::getInstance();
     $app = JFactory::getApplication();
-
     $dbOrder = $this->getOrder($_POST['order_id']);
     $this->loadPaymentParams($dbOrder);
     if (empty($this->payment_params)) {
@@ -160,6 +163,7 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
         $http_status = $result->code;
         $result = json_decode($result->body);
 
+        //check http error
         if ($http_status != 200) {
           $order_status = $this->payment_params->invalid_status;
           $email = new stdClass();
@@ -225,6 +229,7 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
         $this->order_log($order_id, $msgForLog);
         $app->redirect(HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order', $msg, $redirect_message_type);
       } else {
+        //failed transaction
         $msg = $this->idpay_get_failed_message($_POST['track_id'], $_POST['order_id'], $_POST['status']);
         $order_status = $this->payment_params->invalid_status;
 
@@ -247,6 +252,7 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
       $email->body = JText::sprintf("Hello,\r\n A Idpay notification was refused because it could not be verified by the idpay server (or pay cenceled)") . "\r\n\r\n" . JText::sprintf('CHECK_DOCUMENTATION', HIKASHOP_HELPURL . 'payment-idpay-error#invalidtnx');
       $action = false;
       $this->modifyOrder($order_id, $order_status, null, $email);
+      $this->order_log($order_id,$msg);
       $app->redirect(HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order', $msg, 'Error');
     }
 
@@ -354,10 +360,11 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
         break;
       case "1001":
         $msg = "واحد پول انتخاب شده پشتیبانی نمی شود.";
+        $msgNumber='فاقد کد خطا';
         break;
       case null:
         $msg = "خطا دور از انتظار";
-        $msgNumber = '1000';
+        $msgNumber = 'فاقد کد خطا';
         break;
     }
 
