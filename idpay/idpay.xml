@@ -15,7 +15,7 @@
         <filename>idpay_redirect.php</filename>
     </files>
     <updateservers>
-        <server type="extension" priority="1" name="System - IDPay for J2Store">https://static.idpay.ir/plugins/joomla/hikashop-idpay-udpate.xml</server>
+        <server type="extension" priority="1" name="System - IDPay for Hikashop">https://static.idpay.ir/plugins/joomla/hikashop-idpay-udpate.xml</server>
     </updateservers>
     <params addpath="/components/com_hikashop/params">
         <param name="pluginoptions" type="pluginoptions" default="plugin" label="hikashop"
