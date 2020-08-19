@@ -8,7 +8,7 @@
     <authorEmail>info@idpay.ir</authorEmail>
     <creationDate>August 2020</creationDate>
     <copyright>Copyright (C) 2020 IDPay</copyright>
-    <license>https://idpay.ir</license>
+    <license>http://www.gnu.org/licenses/gpl-2.0.html GPLv2 or later</license>
     <files>
         <filename plugin="idpay">idpay.php</filename>
         <filename>idpay_configuration.php</filename>
