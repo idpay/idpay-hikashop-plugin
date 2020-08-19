@@ -6,16 +6,16 @@
     <author>Developer: JMDMahdi, vispa, mnbp1371 , Publisher: IDPay</author>
     <authorUrl>http://idpay.ir</authorUrl>
     <authorEmail>info@idpay.ir</authorEmail>
-    <creationDate>July 2020</creationDate>
+    <creationDate>August 2020</creationDate>
     <copyright>Copyright (C) 2020 IDPay</copyright>
-    <license>http://www.gnu.org/licenses/gpl-2.0.html GPLv2 or later</license>
+    <license>https://idpay.ir</license>
     <files>
         <filename plugin="idpay">idpay.php</filename>
         <filename>idpay_configuration.php</filename>
         <filename>idpay_redirect.php</filename>
     </files>
     <updateservers>
-        <server type="extension" priority="1" name="System - IDPay for Hikashop">https://static.idpay.ir/plugins/joomla/hikashop-idpay-udpate.xml</server>
+        <server type="extension" priority="1" name="Hikashoppayment - IDPay for Hikashop">https://static.idpay.ir/plugins/joomla/hikashop-idpay-update.xml</server>
     </updateservers>
     <params addpath="/components/com_hikashop/params">
         <param name="pluginoptions" type="pluginoptions" default="plugin" label="hikashop"
