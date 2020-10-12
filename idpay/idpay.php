@@ -19,8 +19,11 @@ use Joomla\CMS\Http\HttpFactory;
 class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
 {
   public $accepted_currencies = ['IRR'];
+
   public $multiple = true;
+
   public $name = 'idpay';
+
   public $doc_form = 'idpay';
 
   /**
@@ -49,6 +52,11 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
     return $options;
   }
 
+  /**
+   * @param $order
+   * @param $do
+   * @return bool
+   */
   public function onBeforeOrderCreate(&$order, &$do)
   {
     if (parent::onBeforeOrderCreate($order, $do) === true) {
@@ -126,37 +134,55 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
    */
   public function onPaymentNotification(&$statuses)
   {
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      $pOrderId = $_POST['order_id'];
+      $pTrackId = $_POST['track_id'];
+      $pId = $_POST['id'];
+      $pStatus = $_POST['status'];
+    }
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+      $pOrderId = $_GET['order_id'];
+      $pTrackId = $_GET['track_id'];
+      $pId = $_GET['id'];
+      $pStatus = $_GET['status'];
+    }
+
     $filter = JFilterInput::getInstance();
     $app = JFactory::getApplication();
-    $dbOrder = $this->getOrder($_POST['order_id']);
+
+    if (empty($pOrderId) || empty($pTrackId) || empty($pId) || empty($pStatus)) {
+      $msg = 'Order not found ';
+      $app->redirect(HIKASHOP_LIVE . 'index.php?option=com_hikashop', $msg, 'Error');
+    }
+
+    $dbOrder = $this->getOrder($pOrderId);
     $this->loadPaymentParams($dbOrder);
     if (empty($this->payment_params)) {
       return false;
     }
+
     $this->loadOrderData($dbOrder);
     if (empty($dbOrder)) {
-      echo 'Could not load any order for your notification ' . $_POST['order_id'];
-
-      return false;
+      echo 'Could not load any order for your notification ' . $pOrderId;
+      $app->redirect(HIKASHOP_LIVE . 'index.php?option=com_hikashop', $msg, 'Error');
     }
-    $order_id = $dbOrder->order_id;
 
+    $order_id = $dbOrder->order_id;
     $url = HIKASHOP_LIVE . 'administrator/index.php?option=com_hikashop&ctrl=order&task=edit&order_id=' . $order_id;
     $order_text = "\r\n" . JText::sprintf('NOTIFICATION_OF_ORDER_ON_WEBSITE', $dbOrder->order_number, HIKASHOP_LIVE);
     $order_text .= "\r\n" . str_replace('<br/>', "\r\n", JText::sprintf('ACCESS_ORDER_WITH_LINK', $url));
-    $pid = $_POST['id'];
-    $porder_id = $_POST['order_id'];
-    if (!empty($pid) && !empty($porder_id) && $porder_id == $order_id) {
-      if ($_POST['status'] == 10) {
+
+    if (!empty($pId) && !empty($pOrderId) && $pOrderId == $order_id) {
+      if ($pStatus == 10) {
         $api_key = $this->payment_params->api_key;
         $sandbox = $this->payment_params->sandbox == 'no' ? 'false' : 'true';
-        $price = $_POST['amount'];
 
         $history = new stdClass();
         $history->notified = 0;
         $history->amount = round($dbOrder->order_full_price, (int)$this->currency->currency_locale['int_frac_digits']);
         $history->data = ob_get_clean();
-        $data = array('id' => $pid, 'order_id' => $order_id);
+        $data = array('id' => $pId, 'order_id' => $order_id);
         $url = 'https://api.idpay.ir/v1.1/payment/verify';
         $options = $this->options($api_key, $sandbox);
         $result = $this->http->post($url, json_encode($data, true), $options);
@@ -183,7 +209,7 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
         $hashed_card_no = empty($result->payment->hashed_card_no) ? NULL : $result->payment->hashed_card_no;
 
         $redirect_message_type = '';
-        if (empty($verify_status) || empty($verify_track_id) || empty($verify_amount) || $verify_amount != $price || $verify_status < 100) {
+        if (empty($verify_status) || empty($verify_track_id) || empty($verify_amount) || $verify_status < 100) {
           $order_status = $this->payment_params->pending_status;
           $order_text = JText::sprintf('CHECK_DOCUMENTATION', HIKASHOP_HELPURL . 'payment-idpay-error#verify') . "\r\n\r\n" . $order_text;
           $msg = $this->idpay_get_failed_message($verify_track_id, $verify_order_id);
@@ -230,7 +256,7 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
         $app->redirect(HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order', $msg, $redirect_message_type);
       } else {
         //failed transaction
-        $msg = $this->idpay_get_failed_message($_POST['track_id'], $_POST['order_id'], $_POST['status']);
+        $msg = $this->idpay_get_failed_message($pTrackId, $pOrderId, $pStatus);
         $order_status = $this->payment_params->invalid_status;
 
         $email = new stdClass();
@@ -240,11 +266,12 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
 
         $this->modifyOrder($order_id, $order_status, null, $email);
         //log for payment
-        $this->order_log($order_id, $this->otherStatusMessages($_POST['status']));
+        $this->order_log($order_id, $this->otherStatusMessages($pStatus));
 
         $app->redirect(HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order', $msg, 'Error');
       }
-    } else {
+    }
+    else {
       $msg = 'کاربر از انجام تراکنش منصرف شده است';
       $order_status = $this->payment_params->invalid_status;
       $email = new stdClass();
@@ -252,7 +279,8 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
       $email->body = JText::sprintf("Hello,\r\n A Idpay notification was refused because it could not be verified by the idpay server (or pay cenceled)") . "\r\n\r\n" . JText::sprintf('CHECK_DOCUMENTATION', HIKASHOP_HELPURL . 'payment-idpay-error#invalidtnx');
       $action = false;
       $this->modifyOrder($order_id, $order_status, null, $email);
-      $this->order_log($order_id,$msg);
+      $this->order_log($order_id, $msg);
+
       $app->redirect(HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order', $msg, 'Error');
     }
 
@@ -328,7 +356,7 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
       case "3":
         $msg = "خطا رخ داده است";
         break;
-      case "3":
+      case "4":
         $msg = "بلوکه شده";
         break;
       case "5":
@@ -360,7 +388,7 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
         break;
       case "1001":
         $msg = "واحد پول انتخاب شده پشتیبانی نمی شود.";
-        $msgNumber='فاقد کد خطا';
+        $msgNumber = 'فاقد کد خطا';
         break;
       case null:
         $msg = "خطا دور از انتظار";
@@ -386,6 +414,6 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
     $order->history->history_type = 'payment';
     $orderClass = hikashop_get('class.order');
     $orderClass->save($order);
-
   }
+
 }
