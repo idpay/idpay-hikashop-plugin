@@ -18,7 +18,7 @@ use Joomla\CMS\Http\HttpFactory;
 
 class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
 {
-  public $accepted_currencies = ['IRR', 'TOM'];
+  public $accepted_currencies = ['IRR', 'TOM', 'IRT','TOMAN'];
 
   public $multiple = true;
 
@@ -95,6 +95,9 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
       $app = JFactory::getApplication();
       $app->redirect($cancel_url, $msg, 'Error');
     }
+
+    // Convert Currency
+    $amount = $this->get_amount($amount, $this->currency->currency_code);
 
     // Customer information
     $billing = $order->cart->billing_address;
@@ -414,6 +417,34 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
     $order->history->history_type = 'payment';
     $orderClass = hikashop_get('class.order');
     $orderClass->save($order);
+  }
+
+  /**
+   * @param $amount
+   * @param $currency
+   * @return float|int
+   */
+  public function get_amount( $amount, $currency )
+  {
+    switch (strtolower($currency)) {
+      case strtolower('IRR'):
+      case strtolower('RIAL'):
+        return $amount;
+
+      case strtolower('IRT'):
+      case strtolower('Iranian_TOMAN'):
+      case strtolower('Iran_TOMAN'):
+      case strtolower('Iranian-TOMAN'):
+      case strtolower('Iran-TOMAN'):
+      case strtolower('TOMAN'):
+      case strtolower('Iran TOMAN'):
+      case strtolower('Iranian TOMAN'):
+      case strtolower('TOM'):
+        return $amount * 10;
+
+      default:
+        return 0;
+    }
   }
 
 }
