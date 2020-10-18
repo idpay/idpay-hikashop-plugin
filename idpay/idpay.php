@@ -18,7 +18,7 @@ use Joomla\CMS\Http\HttpFactory;
 
 class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
 {
-  public $accepted_currencies = ['IRR'];
+  public $accepted_currencies = ['IRR', 'TOM'];
 
   public $multiple = true;
 
