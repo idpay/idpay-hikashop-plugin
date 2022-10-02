@@ -2,7 +2,7 @@
 /**
  * IDPay payment plugin
  *
- * @developer JMDMahdi, vispa, mnbp1371
+ * @developer JMDMahdi, vispa, mnbp1371, Mohammad-Malek (MimDeveloper.Tv)
  * @publisher IDPay
  * @package VirtueMart
  * @subpackage payment

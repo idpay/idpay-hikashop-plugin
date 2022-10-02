@@ -2,7 +2,7 @@
 /**
  * IDPay payment plugin
  *
- * @developer JMDMahdi, vispa, mnbp1371
+ * @developer JMDMahdi, vispa, mnbp1371, Mohammad-Malek (MimDeveloper.Tv)
  * @publisher IDPay
  * @package VirtueMart
  * @subpackage payment
@@ -91,9 +91,10 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
     if (empty($amount)) {
       $msg = $this->idpay_get_failed_message(null, null, '1001');
       $this->order_log($order->order_id, $this->otherStatusMessages(1001));
-      $cancel_url = HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order&task=cancel_order&order_id=' . $order->order_id . $this->url_itemid;
       $app = JFactory::getApplication();
-      $app->redirect($cancel_url, $msg, 'Error');
+      $cancel_url = HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order&task=cancel_order&order_id=' . $order->order_id . $this->url_itemid;
+      $app->enqueueMessage($msg, 'Error');
+      $app->redirect(JRoute::_($cancel_url));
     }
 
     // Convert Currency
@@ -119,7 +120,8 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
       $this->order_log($order->order_id, $msg);
       $app = JFactory::getApplication();
       $cancel_url = HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order&task=cancel_order&order_id=' . $order->order_id . $this->url_itemid;
-      $app->redirect($cancel_url, $msg, 'Error');
+      $app->enqueueMessage($msg, 'Error');
+      $app->redirect(JRoute::_($cancel_url));
     }
 
     //save idpay id in db(result id)
@@ -156,7 +158,9 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
 
     if (empty($pOrderId) || empty($pTrackId) || empty($pId) || empty($pStatus)) {
       $msg = 'Order not found ';
-      $app->redirect(HIKASHOP_LIVE . 'index.php?option=com_hikashop', $msg, 'Error');
+      $return_url = HIKASHOP_LIVE . 'index.php?option=com_hikashop';
+      $app->enqueueMessage($msg, 'Error');
+      $app->redirect(JRoute::_($return_url));
     }
 
     $dbOrder = $this->getOrder($pOrderId);
@@ -168,7 +172,9 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
     $this->loadOrderData($dbOrder);
     if (empty($dbOrder)) {
       echo 'Could not load any order for your notification ' . $pOrderId;
-      $app->redirect(HIKASHOP_LIVE . 'index.php?option=com_hikashop', $msg, 'Error');
+      $return_url = HIKASHOP_LIVE . 'index.php?option=com_hikashop';
+      $app->enqueueMessage($msg, 'Error');
+      $app->redirect(JRoute::_($return_url));
     }
 
     $order_id = $dbOrder->order_id;
@@ -201,7 +207,9 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
           $msg = sprintf('خطا هنگام بررسی تراکنش. وضعیت خطا: %s - کد خطا: %s - پیام خطا: %s', $http_status, $result->error_code, $result->error_message);
           $this->modifyOrder($order_id, $order_status, NULL, $email);
           $this->order_log($order_id, $msg);
-          $app->redirect(HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order', $msg, 'Error');
+          $return_url = HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order&order_id=' . $order_id;
+          $app->enqueueMessage($msg, 'Error');
+          $app->redirect(JRoute::_($return_url));
         }
 
         $verify_status = empty($result->status) ? NULL : $result->status;
@@ -245,7 +253,9 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
           $this->modifyOrder($order_id, $order_status, null, $email);
           //log for payment
           $this->order_log($order_id, $this->otherStatusMessages(0));
-          $app->redirect(HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order', $msg, 'Error');
+          $return_url = HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order&order_id=' . $order_id;
+          $app->enqueueMessage($msg, 'Error');
+          $app->redirect(JRoute::_($return_url));
         }
 
         //generate msg for save to db
@@ -256,7 +266,9 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
         $email->body = str_replace('<br/>', "\r\n", JText::sprintf('PAYMENT_NOTIFICATION_STATUS', 'idpay', $order_status)) . ' ' . JText::sprintf('ORDER_STATUS_CHANGED', $order_status) . "\r\n\r\n" . $order_text;
         $this->modifyOrder($order_id, $order_status, $history, $email);
         $this->order_log($order_id, $msgForLog);
-        $app->redirect(HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order', $msg, $redirect_message_type);
+        $return_url = HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order&order_id=' . $order_id;
+        $app->enqueueMessage($msg, 'message');
+        $app->redirect(JRoute::_($return_url));
       } else {
         //failed transaction
         $msg = $this->idpay_get_failed_message($pTrackId, $pOrderId, $pStatus);
@@ -270,8 +282,9 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
         $this->modifyOrder($order_id, $order_status, null, $email);
         //log for payment
         $this->order_log($order_id, $this->otherStatusMessages($pStatus));
-
-        $app->redirect(HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order', $msg, 'Error');
+        $return_url = HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order&order_id=' . $order_id;
+        $app->enqueueMessage($msg, 'Error');
+        $app->redirect(JRoute::_($return_url));
       }
     }
     else {
@@ -283,8 +296,9 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
       $action = false;
       $this->modifyOrder($order_id, $order_status, null, $email);
       $this->order_log($order_id, $msg);
-
-      $app->redirect(HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order', $msg, 'Error');
+      $return_url = HIKASHOP_LIVE . 'index.php?option=com_hikashop&ctrl=order&order_id=' . $order_id;
+      $app->enqueueMessage($msg, 'Error');
+      $app->redirect(JRoute::_($return_url));
     }
 
   }
@@ -316,7 +330,7 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
    */
   public function onPaymentConfiguration(&$element)
   {
-    $subtask = JRequest::getCmd('subtask', '');
+    $subtask = JFactory::getApplication()->getInput()->getCmd('subtask', '');
     parent::onPaymentConfiguration($element);
   }
 
