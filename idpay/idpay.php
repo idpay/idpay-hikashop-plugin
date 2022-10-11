@@ -132,6 +132,11 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
         return $this->showPage('redirect');
     }
 
+    public static function sanitize($variable)
+    {
+        return trim(strip_tags($variable));
+    }
+
     /**
      * @param $statuses
      * @return bool|void
@@ -141,16 +146,16 @@ class plgHikashoppaymentIdpay extends hikashopPaymentPlugin
     {
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $pOrderId = $_POST['order_id'];
-            $pTrackId = $_POST['track_id'];
-            $pId = $_POST['id'];
-            $pStatus = $_POST['status'];
+            $pOrderId = plgHikashoppaymentIdpay::sanitize($_POST['order_id']);
+            $pTrackId = plgHikashoppaymentIdpay::sanitize($_POST['track_id']);
+            $pId = plgHikashoppaymentIdpay::sanitize($_POST['id']);
+            $pStatus = plgHikashoppaymentIdpay::sanitize($_POST['status']);
         }
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            $pOrderId = $_GET['order_id'];
-            $pTrackId = $_GET['track_id'];
-            $pId = $_GET['id'];
-            $pStatus = $_GET['status'];
+            $pOrderId = plgHikashoppaymentIdpay::sanitize($_GET['order_id']);
+            $pTrackId = plgHikashoppaymentIdpay::sanitize($_GET['track_id']);
+            $pId = plgHikashoppaymentIdpay::sanitize($_GET['id']);
+            $pStatus = plgHikashoppaymentIdpay::sanitize($_GET['status']);
         }
 
         $filter = JFilterInput::getInstance();
