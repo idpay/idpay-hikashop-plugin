@@ -1,35 +1,34 @@
-=== IDPay Payment Gateway ===
-Contributors: jmdmahdi, vispa, meysamrazmi, MimDeveloper.Tv (Mohammad Malek)
-Tags: payment, idpay, gateway, آیدی پی
+=== IDPay Payment Gateway For HikaShop ===
+Title : IDPay Payment Gateway For HikaShop
+Tags: HikaShop, payment, idpay, gateway, آیدی پی,HikaShop,HikaShop gateway,HikaShop payment
+Stable tag: 2.0.1
+Tested up to: 4.2.5
+Contributors: MimDeveloper.Tv (Mohammad-Malek), imikiani, meysamrazmi, vispa
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 2.0.1
-Tested up to: 4.1.5
 
 == Description ==
 
-[IDPay](https://idpay.ir) is one of the Financial Technology providers in Iran.
-
-IDPay provides some payment services and this plugin enables the IDPay's payment gateway for Gravity Forms.
+After installing and enabling this plugin, your customers can pay through IDPay gateway.
+For doing a transaction through IDPay gateway,
+you must have an API Key.
+You can obtain the API Key by going to your [dashboard](https://idpay.ir/dashboard/web-services) in your
+ IDPay [account](https://idpay.ir/user).
 
 == Installation ==
 
-After creating a web service on https://idpay.ir and getting an API Key, follow this instruction:
+0. After creating a web service on https://idpay.ir and getting an API Key, follow this instruction:
+1. Activate IDPay Payment Gateway For RsForm Pro.
+2. Go Settings IDPay Payment Gateway For RsForm Pro.
+3. Enter the API Key And More Seeting.
+4. Save Them.
 
-1. Download And Activate plugin IDPay for Platform.
-2. Go to Settings.
-3. Enter the API Key And Save.
-
-If you need to use this plugin in Test mode, check the "Sandbox".
-
-Also there is a complete documentation [here](https://blog.idpay.ir/helps/) which helps you to install the plugin step by step.
-
-Thank you so much for using IDPay Payment Gateway.
+* If you need to use this plugin in Test mode, check the "Sandbox".
 
 == Changelog ==
 
-= 2.0.1, June 18, 2022 =
+= 2.0.1, Nov 13, 2022 =
 * First official release
-* Tested Up With Joomla 4.1.5 & HikaShop 4.6.1
+* Tested Up With Joomla 4.2.5 & HikaShop 4.6.1
 * Check Double Spending Correct
 * Check Does Not Xss Attack Correct
